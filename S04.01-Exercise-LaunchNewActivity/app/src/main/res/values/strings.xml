@@ -27,6 +27,10 @@
     <!--Used in overflow menu to refresh weather data-->
     <string name="action_refresh">Refresh</string>
 
+    <!--Used in back button-->
+    <string name="back_button">Go Back</string>
+
+    <!--Used in error message-->
     <string name="error_message">
         An error has occurred. Please try again by clicking REFRESH
     </string>

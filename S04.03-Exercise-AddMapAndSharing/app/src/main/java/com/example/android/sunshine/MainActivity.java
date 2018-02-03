@@ -222,7 +222,28 @@ public class MainActivity extends AppCompatActivity implements ForecastAdapterOn
         }
 
         // TODO (2) Launch the map when the map menu item is clicked
+        if (id == R.id.map){
+            Uri.Builder builder = new Uri.Builder();
+            builder.scheme("geo")
+                    .path("0,0")
+                    .appendQueryParameter("q", SunshinePreferences.getPreferredWeatherLocation(this));
+            showMap(builder.build());
+        }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void showMap(Uri map){
+        // Create Intent with actin type, Intent.ACTION_VIEW
+        Intent mapIntent = new Intent(Intent.ACTION_VIEW);
+
+        // set the data of the Intent to the URI parameter
+        mapIntent.setData(map);
+
+        //Verify that is intent can be launch.. make sure there is an app available
+        // if not the app will crash!! lol
+        if(mapIntent.resolveActivity(getPackageManager()) != null){
+            startActivity(mapIntent);
+        }
     }
 }
