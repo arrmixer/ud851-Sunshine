@@ -283,7 +283,7 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
             cursorHasValidData = true;
         }
 
-        // added this after I saw solution good practice 
+        // added this after I saw solution good practice
         if(!cursorHasValidData){
             return;
         }
