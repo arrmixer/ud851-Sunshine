@@ -18,12 +18,17 @@ package com.example.android.sunshine.sync;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.support.v7.preference.CheckBoxPreference;
+import android.text.format.DateUtils;
 
+import com.example.android.sunshine.data.SunshinePreferences;
 import com.example.android.sunshine.data.WeatherContract;
 import com.example.android.sunshine.utilities.NetworkUtils;
+import com.example.android.sunshine.utilities.NotificationUtils;
 import com.example.android.sunshine.utilities.OpenWeatherJsonUtils;
 
 import java.net.URL;
+import java.util.concurrent.TimeUnit;
 
 public class SunshineSyncTask {
 
@@ -74,7 +79,18 @@ public class SunshineSyncTask {
                         weatherValues);
 
 //              TODO (13) Check if notifications are enabled
-
+                // areNotificationsEnabled method was not available copied it from solution code
+                // should study good helper method
+                boolean notificationsEnabled = SunshinePreferences.areNotificationsEnabled(context);
+                if (notificationsEnabled) {
+                    //did not need to do this had a helper method should have checked
+//                    int day = 24;
+//                    int dayMilliseconds = (int) TimeUnit.DAYS.toMillis(24);
+                    //also forgot to used >= put > instead
+                    if (SunshinePreferences.getEllapsedTimeSinceLastNotification(context) >= DateUtils.DAY_IN_MILLIS) {
+                        NotificationUtils.notifyUserOfNewWeather(context);
+                    }
+                }
 //              TODO (14) Check if a day has passed since the last notification
 
 //              TODO (15) If more than a day have passed and notifications are enabled, notify the user

@@ -22,6 +22,14 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 
 import com.example.android.sunshine.data.WeatherContract;
+import com.firebase.jobdispatcher.Driver;
+import com.firebase.jobdispatcher.FirebaseJobDispatcher;
+import com.firebase.jobdispatcher.GooglePlayDriver;
+import com.firebase.jobdispatcher.Job;
+import com.firebase.jobdispatcher.Lifetime;
+import com.firebase.jobdispatcher.Trigger;
+
+import java.util.concurrent.TimeUnit;
 
 public class SunshineSyncUtils {
 
@@ -29,9 +37,32 @@ public class SunshineSyncUtils {
 
     private static boolean sInitialized;
 
+    private static final int REMINDER_INTERVAL_HOURS = 3;
+    public static final int REMINDER_INTERVAL_HOUR = 1;
+    private static final int REMINDER_INTERVAL_SECONDS = (int) (TimeUnit.HOURS.toSeconds(REMINDER_INTERVAL_HOURS));
+    public static final int REMINDER_INTERVAL_FLEXTIME = (int) (TimeUnit.HOURS.toSeconds(REMINDER_INTERVAL_HOUR));
+
+
 //  TODO (11) Add a sync tag to identify our sync job
+    public static final String REMINDER_JOB_TAG = "sunshine_weather_sync";
 
 //  TODO (12) Create a method to schedule our periodic weather sync
+    synchronized public static void schedulePeriodicWeatherSync(final Context context){
+
+        Driver driver = new GooglePlayDriver(context);
+        FirebaseJobDispatcher dispatcher = new FirebaseJobDispatcher(driver);
+
+        Job periodicWeatherSyncJob = dispatcher.newJobBuilder()
+                .setService(SunshineFirebaseJobService.class)
+                .setTag(REMINDER_JOB_TAG)
+                .setLifetime(Lifetime.FOREVER)
+                .setRecurring(true)
+                .setTrigger(Trigger.executionWindow(REMINDER_INTERVAL_SECONDS, REMINDER_INTERVAL_FLEXTIME+REMINDER_INTERVAL_SECONDS))
+                .build();
+
+        dispatcher.schedule(periodicWeatherSyncJob);
+
+    }
 
     /**
      * Creates periodic sync tasks and checks to see if an immediate sync is required. If an
@@ -51,7 +82,7 @@ public class SunshineSyncUtils {
         sInitialized = true;
 
 //      TODO (13) Call the method you created to schedule a periodic weather sync
-
+        schedulePeriodicWeatherSync(context);
         /*
          * We need to check to see if our ContentProvider has data to display in our forecast
          * list. However, performing a query on the main thread is a bad idea as this may
